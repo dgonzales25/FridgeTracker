@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">FridgeTracker</string>
+
+    <string name="title_section1">Fridge</string>
+    <string name="title_section2">Pantry</string>
+    <string name="title_section3">List</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_example">Example action</string>
+
+    <string name="action_settings">Settings</string>
+
+    <string name="remove_button">Remove</string>
+    <string name="add_to_list_button">Add to List</string>
+</resources>
