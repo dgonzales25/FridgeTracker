@@ -13,7 +13,7 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v7.app.AlertDialog;
+import android.app.AlertDialog;
 import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -21,6 +21,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -107,7 +109,7 @@ public class NavigationDrawerFragment extends Fragment {
         });
         mDrawerListView.setAdapter(new ArrayAdapter<String>(
                 getActionBar().getThemedContext(),
-                android.R.layout.simple_list_item_activated_1,
+                android.R.layout.simple_list_item_1,
                 android.R.id.text1,
                 new String[]{
                         getString(R.string.title_section1),
@@ -257,13 +259,16 @@ public class NavigationDrawerFragment extends Fragment {
 
         if (item.getItemId() == R.id.add_item) {
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            builder.setTitle("Add Item");
 
             // Set up the input
             final EditText input = new EditText(getActivity());
             // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
             input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_WORDS);
+
+            builder.setTitle("Add Item");
+
             builder.setView(input);
+
 
             // Set up the buttons
             builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -282,6 +287,7 @@ public class NavigationDrawerFragment extends Fragment {
                             selectItem(2);
                         }
                     }
+
                 }
 
 
@@ -294,48 +300,6 @@ public class NavigationDrawerFragment extends Fragment {
             });
 
             builder.show();
-
-            return true;
-        } else if (item.getItemId() == R.id.remove_item){
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            builder.setTitle("Remove Item");
-
-            // Set up the input
-            final EditText input = new EditText(getActivity());
-            // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
-            input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_WORDS);
-            builder.setView(input);
-
-            // Set up the buttons
-            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    m_Text = input.getText().toString().trim();
-                    if (m_Text.length() > 0) {
-                        if (mCurrentSelectedPosition == 0) {
-                            mFridgeOpenHelper.deleteItemFridge(m_Text);
-                            selectItem(0);
-                        } else if (mCurrentSelectedPosition == 1) {
-                            mFridgeOpenHelper.deleteItemPantry(m_Text);
-                            selectItem(1);
-                        } else {
-                            mFridgeOpenHelper.deleteItemList(m_Text);
-                            selectItem(2);
-                        }
-                    }
-                }
-
-
-            });
-            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.cancel();
-                }
-            });
-
-            builder.show();
-
             return true;
         }
 

@@ -1,6 +1,7 @@
 package com.example.daniel.myapplication;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.v4.app.FragmentTransaction;
@@ -13,6 +14,8 @@ import android.support.v4.app.FragmentManager;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
+import android.text.InputType;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -20,7 +23,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.support.v4.widget.DrawerLayout;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -40,6 +46,7 @@ public class MainActivity extends ActionBarActivity
      * Used to store the last screen title. For use in {@link #restoreActionBar()}.
      */
     private CharSequence mTitle;
+    public ListView mListView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +70,7 @@ public class MainActivity extends ActionBarActivity
         fragmentManager.beginTransaction()
                 .replace(R.id.container, PlaceholderFragment.newInstance(position + 1))
                 .commit();
+
     }
 
     public void onSectionAttached(int number) {
@@ -152,6 +160,7 @@ public class MainActivity extends ActionBarActivity
         public PlaceholderFragment() {
         }
 
+
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
@@ -200,6 +209,97 @@ public class MainActivity extends ActionBarActivity
                     getArguments().getInt(ARG_SECTION_NUMBER));
         }
 
+        @Override
+        public void onResume() {
+            super.onResume();
+        }
+
+        @Override
+        public void onListItemClick(ListView l, final View v, final int position, long id) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setTitle("Remove Item");
+            TextView m_TextView = (TextView) mListView.getChildAt(position).findViewById(R.id.list_text1);
+            final String m_Text = m_TextView.getText().toString().trim();
+            if(selection != 3) {
+                builder.setItems(new CharSequence[]
+                                {"Remove", "Add to List", "Cancel"},
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // The 'which' argument contains the index position
+                                // of the selected item
+                                switch (which) {
+                                    case 0:
+                                        if (m_Text.length() > 0) {
+                                            if (selection == 1) {
+                                                mFridgeOpenHelper.deleteItemFridge(m_Text);
+                                                mCursor = mFridgeOpenHelper.getAllItemsFridge();
+                                            } else if (selection == 2) {
+                                                mFridgeOpenHelper.deleteItemPantry(m_Text);
+                                                mCursor = mFridgeOpenHelper.getAllItemsPantry();
+                                            }
+                                        }
+                                        mListAdapter.changeCursor(mCursor);
+                                        break;
+                                    case 1:
+                                        if (m_Text.length() > 0) {
+                                            mFridgeOpenHelper.addItemList(m_Text);
+                                            if (selection == 1) {
+                                                mFridgeOpenHelper.deleteItemFridge(m_Text);
+                                                mCursor = mFridgeOpenHelper.getAllItemsFridge();
+                                            } else if (selection == 2) {
+                                                mFridgeOpenHelper.deleteItemPantry(m_Text);
+                                                mCursor = mFridgeOpenHelper.getAllItemsPantry();
+                                            }
+                                        }
+                                        mListAdapter.changeCursor(mCursor);
+                                        break;
+                                    case 2:
+                                        dialog.cancel();
+                                        break;
+                                }
+                            }
+                        });
+            } else {
+                builder.setItems(new CharSequence[]
+                                {"Remove", "Add to Fridge", "Add to Pantry", "Cancel"},
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // The 'which' argument contains the index position
+                                // of the selected item
+                                switch (which) {
+                                    case 0:
+                                        if (m_Text.length() > 0) {
+                                            mFridgeOpenHelper.deleteItemList(m_Text);
+                                            mCursor = mFridgeOpenHelper.getAllItemsList();
+                                        }
+                                        mListAdapter.changeCursor(mCursor);
+                                        break;
+                                    case 1:
+                                        if (m_Text.length() > 0) {
+                                            mFridgeOpenHelper.addItemFridge(m_Text);
+                                            mFridgeOpenHelper.deleteItemList(m_Text);
+                                            mCursor = mFridgeOpenHelper.getAllItemsList();
+                                        }
+                                        mListAdapter.changeCursor(mCursor);
+                                        break;
+                                    case 2:
+                                        if (m_Text.length() > 0) {
+                                            mFridgeOpenHelper.addItemPantry(m_Text);
+                                            mFridgeOpenHelper.deleteItemList(m_Text);
+                                            mCursor = mFridgeOpenHelper.getAllItemsList();
+                                        }
+                                        mListAdapter.changeCursor(mCursor);
+                                        break;
+                                    case 3:
+                                        dialog.cancel();
+                                        break;
+                                }
+                            }
+                        });
+            }
+            builder.create().show();
+            super.onListItemClick(l, v, position, id);
+        }
     }
 
 }
